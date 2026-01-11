@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["rodrigo.serrano@dekuple.es"]
 
   spec.summary = "Odoo API wrapper (using the modern JSON-2 API)"
-  spec.description = "This gem implements a wrapper to interact with Odoo's API in Ruby. "\
+  spec.description = "This gem implements a wrapper to interact with Odoo's API in Ruby. " \
                      "The API used is Odoo's 'external JSON-2 API' introduced in Odoo v19."
   spec.homepage = "https://github.com/dekuple/rodoo"
   spec.license = "MIT"
@@ -18,6 +18,7 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/main/CHANGELOG.md"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

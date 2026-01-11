@@ -1,8 +1,32 @@
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 3.1
+  SuggestExtensions: false
+
+Layout/LineLength:
+  Max: 105
+
+Metrics/MethodLength:
+  Max: 15
+  Exclude:
+    - "test/**/*"
+
+Metrics/ClassLength:
+  Max: 105
+  Exclude:
+    - "test/**/*"
+
+Style/Documentation:
+  Enabled: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes
+
+# validate! is a bang method that raises exceptions, not a predicate method.
+# Rubocop incorrectly flags it because it starts with "valid".
+Naming/PredicateMethod:
+  AllowedMethods:
+    - validate!
