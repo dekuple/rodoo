@@ -20,6 +20,7 @@ module Rodoo
   autoload :Project, "rodoo/models/project"
   autoload :ProviderCreditNote, "rodoo/models/provider_credit_note"
   autoload :ProviderInvoice, "rodoo/models/provider_invoice"
+  autoload :Tax, "rodoo/models/tax"
 
   @configuration = nil
   @connection = nil
