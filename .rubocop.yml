@@ -11,6 +11,10 @@ Metrics/MethodLength:
   Exclude:
     - "test/**/*"
 
+Metrics/AbcSize:
+  Exclude:
+    - "test/**/*"
+
 Metrics/ClassLength:
   Max: 105
   Exclude:

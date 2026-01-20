@@ -12,6 +12,7 @@ module Rodoo
   autoload :AccountingEntryLine, "rodoo/models/accounting_entry_line"
   autoload :AnalyticAccount, "rodoo/models/analytic_account"
   autoload :AnalyticPlan, "rodoo/models/analytic_plan"
+  autoload :Attachment, "rodoo/models/attachment"
   autoload :CustomerCreditNote, "rodoo/models/customer_credit_note"
   autoload :CustomerInvoice, "rodoo/models/customer_invoice"
   autoload :JournalEntry, "rodoo/models/journal_entry"

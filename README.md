@@ -149,6 +149,73 @@ contact.destroy
 contact.destroyed?  # => true
 ```
 
+### Attachments
+
+Attach PDF files to accounting entries (invoices, credit notes, journal entries):
+
+```ruby
+invoice = Rodoo::ProviderInvoice.find(42)
+
+# Attach from file path (sets as main attachment by default)
+invoice.attach_pdf("/path/to/invoice.pdf")
+
+# Attach with custom filename
+invoice.attach_pdf("/path/to/document.pdf", filename: "vendor_invoice.pdf")
+
+# Attach without setting as main attachment
+invoice.attach_pdf("/path/to/supporting.pdf", set_as_main: false)
+
+# Attach from base64 data
+invoice.attach_pdf_from_base64(base64_content, filename: "invoice.pdf")
+
+# List attachments
+invoice.attachments
+invoice.attachments(mimetype: "application/pdf")
+
+# Get the main attachment
+invoice.main_attachment
+
+# Set a different attachment as main
+invoice.set_main_attachment(attachment_id)
+```
+
+#### With Rails ActiveStorage
+
+When using ActiveStorage in a Rails application:
+
+```ruby
+# Rails model with ActiveStorage attachment
+class Invoice < ApplicationRecord
+  has_one_attached :pdf_document
+end
+
+# Sync to Odoo
+rails_invoice = Invoice.find(123)
+odoo_invoice = Rodoo::ProviderInvoice.find(42)
+
+rails_invoice.pdf_document.open do |tempfile|
+  odoo_invoice.attach_pdf(tempfile, filename: rails_invoice.pdf_document.filename.to_s)
+end
+```
+
+#### Direct Attachment model usage
+
+```ruby
+# Create attachment for any record
+Rodoo::Attachment.create_for(
+  record, "/path/to/file.pdf", filename: "doc.pdf", mimetype: "application/pdf"
+)
+
+# Create from base64
+Rodoo::Attachment.create_from_base64(
+  record, base64_data, filename: "doc.pdf", mimetype: "application/pdf"
+)
+
+# Find attachments for a record
+Rodoo::Attachment.for_record(record)
+Rodoo::Attachment.for_record(record, mimetype: "application/pdf")
+```
+
 ### Available models
 
 Rodoo includes pre-built models for common Odoo objects:
@@ -159,6 +226,7 @@ Rodoo includes pre-built models for common Odoo objects:
 | `Rodoo::Project` | `project.project` |
 | `Rodoo::AnalyticAccount` | `account.analytic.account` |
 | `Rodoo::AnalyticPlan` | `account.analytic.plan` |
+| `Rodoo::Attachment` | `ir.attachment` |
 | `Rodoo::AccountingEntry` | `account.move` (all types) |
 | `Rodoo::CustomerInvoice` | `account.move` (move_type: out_invoice) |
 | `Rodoo::ProviderInvoice` | `account.move` (move_type: in_invoice) |
