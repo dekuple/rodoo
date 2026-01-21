@@ -10,7 +10,8 @@ module Rodoo
   #   project = Rodoo::Project.where([["is_company", "=", true]])
   #
   # @example Create a project
-  #   project = Rodoo::Project.create(name: "my_project", account_id: analytic_account_id, allow_billable: true)
+  #   project = Rodoo::Project.create(name: "my_project", account_id: analytic_account_id,
+  #     allow_billable: true)
   #
   class Project < Model
     model_name "project.project"

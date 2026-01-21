@@ -36,25 +36,27 @@ module Rodoo
     # Search for records, automatically scoped to the move_type
     #
     # @param conditions [Array, Hash, String, nil] Query conditions
-    # @param options [Hash] Additional options (fields, limit, offset)
+    # @param options [Hash] Additional options (fields, limit, offset, lang)
     # @return [Array<AccountingEntry>] Array of matching records
     def self.where(conditions = nil, **options)
-      domain = DomainBuilder.build(conditions, options.except(:fields, :limit, :offset))
+      domain = DomainBuilder.build(conditions, options.except(:fields, :limit, :offset, :lang))
       domain = [["move_type", "=", default_move_type]] + domain if default_move_type
-      super(domain, **options.slice(:fields, :limit, :offset))
+      super(domain, **options.slice(:fields, :limit, :offset, :lang))
     end
 
     # Create a new record, automatically setting the move_type
     #
     # @param attrs [Hash] Attributes for the new record
+    # @param lang [String, nil] Language code for translatable fields
     # @return [AccountingEntry] The created record
-    def self.create(attrs)
+    def self.create(attrs = nil, lang: nil, **kwargs)
+      actual_attrs = attrs || kwargs
       scoped_attrs = if default_move_type
-                       { move_type: default_move_type }.merge(attrs)
+                       { move_type: default_move_type }.merge(actual_attrs)
                      else
-                       attrs
+                       actual_attrs
                      end
-      super(scoped_attrs)
+      super(scoped_attrs, lang: lang)
     end
 
     # Attach a PDF file to this record

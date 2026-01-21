@@ -79,6 +79,47 @@ class AccountingEntryTest < RodooTestCase
     assert_includes domain, ["state", "=", "draft"]
   end
 
+  # === Language support ===
+
+  def test_accounting_entry_where_with_lang_passes_context
+    stub_odoo("account.move", "search_read", response: [])
+
+    Rodoo::AccountingEntry.where(state: "posted", lang: "es_ES")
+
+    assert_equal({ lang: "es_ES" }, last_request_body[:context])
+  end
+
+  def test_customer_invoice_where_with_lang_passes_context
+    stub_odoo("account.move", "search_read", response: [])
+
+    Rodoo::CustomerInvoice.where(state: "posted", lang: "fr_FR")
+
+    assert_equal({ lang: "fr_FR" }, last_request_body[:context])
+    # Also verify move_type is still prepended
+    assert_equal ["move_type", "=", "out_invoice"], last_request_body[:domain].first
+  end
+
+  def test_provider_invoice_create_with_lang_passes_context
+    stub_odoo("account.move", "create", response: [123])
+    stub_odoo("account.move", "read", response: [{ id: 123, move_type: "in_invoice" }])
+
+    Rodoo::ProviderInvoice.create({ partner_id: 42 }, lang: "de_DE")
+
+    # Verify context is passed to create
+    create_request = request_bodies.first
+    assert_equal({ lang: "de_DE" }, create_request[:context])
+    # Verify move_type is still set
+    assert_equal "in_invoice", create_request[:vals_list].first[:move_type]
+  end
+
+  def test_accounting_entry_where_without_lang_omits_context
+    stub_odoo("account.move", "search_read", response: [])
+
+    Rodoo::AccountingEntry.where(state: "posted")
+
+    refute_includes last_request_body.keys, :context
+  end
+
   # Attachment tests
 
   def test_attach_pdf_from_file_path

@@ -32,6 +32,22 @@ class ModelTest < RodooTestCase
     assert_raises(Rodoo::NotFoundError) { TestEntity.find(999) }
   end
 
+  def test_find_with_lang_passes_context
+    stub_odoo("test.entity", "read", response: [{ id: 42, name: "Trouvé" }])
+
+    TestEntity.find(42, lang: "fr_FR")
+
+    assert_equal({ ids: [42], context: { lang: "fr_FR" } }, last_request_body)
+  end
+
+  def test_find_without_lang_omits_context
+    stub_odoo("test.entity", "read", response: [{ id: 42, name: "Found" }])
+
+    TestEntity.find(42)
+
+    assert_equal({ ids: [42] }, last_request_body)
+  end
+
   # === where ===
 
   def test_where_returns_array_of_instances
@@ -85,6 +101,22 @@ class ModelTest < RodooTestCase
 
   def test_where_raises_on_invalid_string_condition
     assert_raises(ArgumentError) { TestEntity.where("invalid condition without operator") }
+  end
+
+  def test_where_with_lang_passes_context
+    stub_search_read([])
+
+    TestEntity.where(is_company: true, lang: "es_ES")
+
+    assert_equal({ lang: "es_ES" }, last_request_body[:context])
+  end
+
+  def test_where_without_lang_omits_context
+    stub_search_read([])
+
+    TestEntity.where(is_company: true)
+
+    refute_includes last_request_body.keys, :context
   end
 
   # === String Domain Parsing (data-driven) ===
@@ -149,6 +181,14 @@ class ModelTest < RodooTestCase
     assert_equal({ domain: [], limit: 5 }, last_request_body)
   end
 
+  def test_all_with_lang_passes_context
+    stub_search_read([])
+
+    TestEntity.all(limit: 5, lang: "de_DE")
+
+    assert_equal({ lang: "de_DE" }, last_request_body[:context])
+  end
+
   # === find_by ===
 
   def test_find_by_returns_first_matching_record
@@ -198,6 +238,14 @@ class ModelTest < RodooTestCase
     assert_equal [["name", "ilike", "%test%"]], last_request_body[:domain]
   end
 
+  def test_find_by_with_lang_passes_context
+    stub_search_read([])
+
+    TestEntity.find_by(email: "test@example.com", lang: "it_IT")
+
+    assert_equal({ lang: "it_IT" }, last_request_body[:context])
+  end
+
   # === find_by! ===
 
   def test_find_by_bang_returns_record_when_found
@@ -216,6 +264,14 @@ class ModelTest < RodooTestCase
 
     assert_includes error.message, "test.entity"
     assert_includes error.message, "email"
+  end
+
+  def test_find_by_bang_with_lang_passes_context
+    stub_search_read([{ id: 42, email: "test@example.com" }])
+
+    TestEntity.find_by!(email: "test@example.com", lang: "pt_BR")
+
+    assert_equal({ lang: "pt_BR" }, last_request_body[:context])
   end
 
   # === create ===
@@ -238,6 +294,33 @@ class ModelTest < RodooTestCase
     TestEntity.create(name: "Test", email: "test@example.com")
 
     assert_equal({ vals_list: [{ name: "Test", email: "test@example.com" }] }, request_bodies.first)
+  end
+
+  def test_create_with_lang_passes_context
+    stub_odoo("test.entity", "create", response: [1])
+    stub_odoo("test.entity", "read", response: [{ id: 1, name: "Créé" }])
+
+    TestEntity.create({ name: "Créé" }, lang: "fr_FR")
+
+    # Verify context is passed to create
+    create_request = request_bodies.first
+    assert_equal({ lang: "fr_FR" }, create_request[:context])
+
+    # Verify lang is also passed to find (read)
+    read_request = request_bodies.last
+    assert_equal({ lang: "fr_FR" }, read_request[:context])
+  end
+
+  def test_create_without_lang_omits_context
+    stub_odoo("test.entity", "create", response: [1])
+    stub_odoo("test.entity", "read", response: [{ id: 1 }])
+
+    TestEntity.create(name: "Test")
+
+    # Neither create nor read should have context
+    request_bodies.each do |body|
+      refute_includes body.keys, :context
+    end
   end
 
   # === Instance: initialization ===

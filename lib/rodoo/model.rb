@@ -21,7 +21,7 @@ module Rodoo
   #   contact.email = "draft@example.com"
   #   contact.save
   #
-  class Model
+  class Model # rubocop:disable Metrics/ClassLength
     # ============================================
     # Class-level configuration and query methods
     # ============================================
@@ -48,8 +48,13 @@ module Rodoo
     #   contact = Rodoo::Contact.find(42)
     #   contact.name  # => "Acme Corp"
     #
-    def self.find(id)
-      result = execute("read", ids: [id])
+    # @example With language
+    #   contact = Rodoo::Contact.find(42, lang: "fr_FR")
+    #
+    def self.find(id, lang: nil)
+      params = { ids: [id] }
+      params[:context] = { lang: lang } if lang
+      result = execute("read", params)
       raise NotFoundError, "#{model_name} with id=#{id} not found" if result.nil? || result.empty?
 
       new(result.first)
@@ -75,13 +80,19 @@ module Rodoo
     # @example Raw Odoo domain (array of arrays)
     #   Rodoo::Contact.where([["is_company", "=", true]], limit: 10)
     #
-    def self.where(conditions = nil, fields: nil, limit: nil, offset: nil, **attrs)
+    # @example With language
+    #   Rodoo::Contact.where(is_company: true, lang: "es_ES")
+    #
+    # rubocop:disable Metrics/ParameterLists
+    def self.where(conditions = nil, fields: nil, limit: nil, offset: nil, lang: nil, **attrs)
+      # rubocop:enable Metrics/ParameterLists
       domain = DomainBuilder.build(conditions, attrs)
 
       params = { domain: domain }
       params[:fields] = fields if fields
       params[:limit] = limit if limit
       params[:offset] = offset if offset
+      params[:context] = { lang: lang } if lang
 
       execute("search_read", params).map { |record| new(record) }
     end
@@ -95,8 +106,11 @@ module Rodoo
     # @example
     #   all_contacts = Rodoo::Contact.all(limit: 100)
     #
-    def self.all(fields: nil, limit: nil)
-      where([], fields: fields, limit: limit)
+    # @example With language
+    #   all_contacts = Rodoo::Contact.all(limit: 100, lang: "de_DE")
+    #
+    def self.all(fields: nil, limit: nil, lang: nil)
+      where([], fields: fields, limit: limit, lang: lang)
     end
 
     # Find a single record by attribute conditions
@@ -116,8 +130,11 @@ module Rodoo
     # @example Find by raw domain
     #   contact = Rodoo::Contact.find_by([["name", "ilike", "%acme%"]])
     #
-    def self.find_by(conditions = nil, **attrs)
-      where(conditions, limit: 1, **attrs).first
+    # @example With language
+    #   contact = Rodoo::Contact.find_by(name: "Acme", lang: "fr_FR")
+    #
+    def self.find_by(conditions = nil, lang: nil, **attrs)
+      where(conditions, limit: 1, lang: lang, **attrs).first
     end
 
     # Find a single record by attribute conditions, raising if not found
@@ -129,8 +146,11 @@ module Rodoo
     # @example Find by email (raises if not found)
     #   contact = Rodoo::Contact.find_by!(email: "john@example.com")
     #
-    def self.find_by!(conditions = nil, **attrs)
-      record = find_by(conditions, **attrs)
+    # @example With language
+    #   contact = Rodoo::Contact.find_by!(email: "john@example.com", lang: "it_IT")
+    #
+    def self.find_by!(conditions = nil, lang: nil, **attrs)
+      record = find_by(conditions, lang: lang, **attrs)
       return record if record
 
       raise NotFoundError, "#{model_name} matching #{conditions.inspect} #{attrs.inspect} not found"
@@ -145,9 +165,15 @@ module Rodoo
     #   contact = Rodoo::Contact.create(name: "New Contact", email: "new@example.com")
     #   contact.id  # => 123
     #
-    def self.create(attrs)
-      ids = execute("create", vals_list: [attrs])
-      find(ids.first)
+    # @example With language
+    #   contact = Rodoo::Contact.create({ name: "Nouveau Contact" }, lang: "fr_FR")
+    #
+    def self.create(attrs = nil, lang: nil, **kwargs)
+      actual_attrs = attrs || kwargs
+      params = { vals_list: [actual_attrs] }
+      params[:context] = { lang: lang } if lang
+      ids = execute("create", params)
+      find(ids.first, lang: lang)
     end
 
     # Execute an Odoo method via the JSON-2 API
