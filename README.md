@@ -107,6 +107,30 @@ all_contacts = Rodoo::Contact.all(limit: 100)
 
 Supported operators in string conditions: `=`, `!=`, `<>`, `<`, `>`, `<=`, `>=`, `like`, `ilike`, `=like`, `=ilike`
 
+### Language-specific responses
+
+Use the `lang:` parameter to retrieve translatable fields (like `name`, `description`) in a specific language:
+
+```ruby
+# Find with language
+contact = Rodoo::Contact.find(42, lang: "fr_FR")
+contact.name  # => "Société Acme" (French translation)
+
+# Query with language
+products = Rodoo::Product.where(type: "consu", lang: "es_ES")
+
+# All records with language
+contacts = Rodoo::Contact.all(limit: 100, lang: "de_DE")
+
+# Find by with language
+contact = Rodoo::Contact.find_by(email: "john@example.com", lang: "it_IT")
+
+# Create with language (for translatable field values)
+contact = Rodoo::Contact.create({ name: "Nouveau Contact" }, lang: "fr_FR")
+```
+
+The language code should match one of the languages installed in your Odoo instance (e.g., `en_US`, `fr_FR`, `es_ES`, `de_DE`).
+
 ### Creating records
 
 ```ruby
