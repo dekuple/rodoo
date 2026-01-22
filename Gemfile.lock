@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rodoo (0.2.0)
+    rodoo (0.3.0)
       base64
 
 GEM
