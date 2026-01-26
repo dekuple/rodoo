@@ -275,6 +275,37 @@ module Rodoo
       @destroyed == true
     end
 
+    # Posts a message to the record's chatter (mail thread).
+    # This is used for internal notes, comments, and notifications in Odoo.
+    #
+    # @param body [String] HTML content of the message
+    # @param message_type [String] Type: "comment", "notification", "email", "user_notification"
+    # @param subtype_xmlid [String, nil] XML ID for subtype (e.g., "mail.mt_note" for internal notes)
+    # @param kwargs [Hash] Additional parameters to pass to message_post
+    # @return [Integer] The ID of the created mail.message record
+    # @raise [Rodoo::Error] If the record hasn't been persisted
+    #
+    # @example Post an internal note
+    #   invoice.message_post(
+    #     body: "<p>This is an internal note</p>",
+    #     message_type: "comment",
+    #     subtype_xmlid: "mail.mt_note"
+    #   )
+    #
+    def message_post(body:, message_type: "comment", subtype_xmlid: nil, **kwargs)
+      raise Error, "Cannot post message to a record that hasn't been persisted" unless persisted?
+
+      params = {
+        ids: [id],
+        body: body,
+        message_type: message_type,
+        subtype_xmlid: subtype_xmlid,
+        **kwargs
+      }.compact
+
+      self.class.execute("message_post", params)
+    end
+
     def inspect
       "#<#{self.class.name} id=#{id.inspect} #{inspectable_attributes}>"
     end

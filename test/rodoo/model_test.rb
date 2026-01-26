@@ -502,6 +502,50 @@ class ModelTest < RodooTestCase
     refute record.destroyed?
   end
 
+  # === Instance: message_post ===
+
+  def test_message_post_calls_api_with_params
+    stub_odoo("test.entity", "message_post", response: 123)
+    record = TestEntity.new(id: 42)
+
+    result = record.message_post(
+      body: "<p>Internal note</p>",
+      message_type: "comment",
+      subtype_xmlid: "mail.mt_note"
+    )
+
+    expected = {
+      ids: [42], body: "<p>Internal note</p>", message_type: "comment", subtype_xmlid: "mail.mt_note"
+    }
+    assert_equal expected, last_request_body
+    assert_equal 123, result
+  end
+
+  def test_message_post_omits_nil_subtype_xmlid
+    stub_odoo("test.entity", "message_post", response: 456)
+    record = TestEntity.new(id: 42)
+
+    record.message_post(body: "<p>Note</p>")
+
+    expected = { ids: [42], body: "<p>Note</p>", message_type: "comment" }
+    assert_equal expected, last_request_body
+  end
+
+  def test_message_post_passes_additional_kwargs
+    stub_odoo("test.entity", "message_post", response: 789)
+    record = TestEntity.new(id: 42)
+
+    record.message_post(body: "<p>Note</p>", partner_ids: [1, 2])
+
+    assert_equal [1, 2], last_request_body[:partner_ids]
+  end
+
+  def test_message_post_raises_for_unpersisted_record
+    record = TestEntity.new(name: "Draft")
+
+    assert_raises(Rodoo::Error) { record.message_post(body: "<p>Note</p>") }
+  end
+
   private
 
   def stub_search_read(response)

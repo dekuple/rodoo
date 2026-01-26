@@ -173,6 +173,35 @@ contact.destroy
 contact.destroyed?  # => true
 ```
 
+### Posting messages (chatter)
+
+Post internal notes or messages to a record's chatter using Odoo's mail thread functionality:
+
+```ruby
+invoice = Rodoo::CustomerInvoice.find(42)
+
+# Post an internal note
+invoice.message_post(
+  body: "<p>This is an internal note</p>",
+  message_type: "comment",
+  subtype_xmlid: "mail.mt_note"
+)
+
+# Post with additional parameters (e.g., notify specific partners)
+invoice.message_post(
+  body: "<p>Please review this invoice</p>",
+  message_type: "comment",
+  subtype_xmlid: "mail.mt_comment",
+  partner_ids: [10, 20]
+)
+```
+
+**Parameters:**
+- `body:` (required) - HTML content of the message
+- `message_type:` - Type of message: `"comment"` (default), `"notification"`, `"email"`, `"user_notification"`
+- `subtype_xmlid:` - XML ID for subtype (e.g., `"mail.mt_note"` for internal notes, `"mail.mt_comment"` for comments)
+- Additional kwargs are passed directly to Odoo's `message_post` method
+
 ### Attachments
 
 Attach PDF files to accounting entries (invoices, credit notes, journal entries):
