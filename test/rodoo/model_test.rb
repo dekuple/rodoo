@@ -546,6 +546,53 @@ class ModelTest < RodooTestCase
     assert_raises(Rodoo::Error) { record.message_post(body: "<p>Note</p>") }
   end
 
+  # === Instance: message_subscribe ===
+
+  def test_message_subscribe_calls_api_with_params
+    stub_odoo("test.entity", "message_subscribe", response: true)
+    record = TestEntity.new(id: 42)
+
+    result = record.message_subscribe(partner_ids: [456, 789])
+
+    expected = { ids: [42], partner_ids: [456, 789] }
+    assert_equal expected, last_request_body
+    assert result
+  end
+
+  def test_message_subscribe_passes_subtype_ids
+    stub_odoo("test.entity", "message_subscribe", response: true)
+    record = TestEntity.new(id: 42)
+
+    record.message_subscribe(partner_ids: [456], subtype_ids: [1, 2])
+
+    expected = { ids: [42], partner_ids: [456], subtype_ids: [1, 2] }
+    assert_equal expected, last_request_body
+  end
+
+  def test_message_subscribe_omits_nil_subtype_ids
+    stub_odoo("test.entity", "message_subscribe", response: true)
+    record = TestEntity.new(id: 42)
+
+    record.message_subscribe(partner_ids: [456])
+
+    refute last_request_body.key?(:subtype_ids)
+  end
+
+  def test_message_subscribe_passes_additional_kwargs
+    stub_odoo("test.entity", "message_subscribe", response: true)
+    record = TestEntity.new(id: 42)
+
+    record.message_subscribe(partner_ids: [456], custom_param: "value")
+
+    assert_equal "value", last_request_body[:custom_param]
+  end
+
+  def test_message_subscribe_raises_for_unpersisted_record
+    record = TestEntity.new(name: "Draft")
+
+    assert_raises(Rodoo::Error) { record.message_subscribe(partner_ids: [456]) }
+  end
+
   private
 
   def stub_search_read(response)

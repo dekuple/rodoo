@@ -306,6 +306,30 @@ module Rodoo
       self.class.execute("message_post", params)
     end
 
+    # Subscribes partners as followers to the record.
+    #
+    # @param partner_ids [Array<Integer>] List of partner IDs to subscribe
+    # @param subtype_ids [Array<Integer>, nil] Optional list of subtype IDs for notifications
+    # @param kwargs [Hash] Additional parameters to pass to the Odoo method
+    # @return [Boolean] True on success
+    # @raise [Rodoo::Error] If the record hasn't been persisted
+    #
+    # @example Subscribe contacts to an invoice
+    #   invoice.message_subscribe(partner_ids: [456, 789])
+    #
+    def message_subscribe(partner_ids:, subtype_ids: nil, **kwargs)
+      raise Error, "Cannot subscribe to a record that hasn't been persisted" unless persisted?
+
+      params = {
+        ids: [id],
+        partner_ids: partner_ids,
+        subtype_ids: subtype_ids,
+        **kwargs
+      }.compact
+
+      self.class.execute("message_subscribe", params)
+    end
+
     def inspect
       "#<#{self.class.name} id=#{id.inspect} #{inspectable_attributes}>"
     end
