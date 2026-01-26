@@ -1,5 +1,11 @@
 ## [Unreleased]
 
+## [0.4.0] - 2026-01-26
+
+### Added
+
+- Add `message_post` instance method for posting messages to Odoo records
+
 ## [0.3.0] - 2026-01-22
 
 ### Added
