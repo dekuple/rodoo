@@ -8,6 +8,7 @@ require_relative "rodoo/domain_builder"
 require_relative "rodoo/model"
 
 module Rodoo
+  autoload :Account, "rodoo/models/account"
   autoload :AccountingEntry, "rodoo/models/accounting_entry"
   autoload :AccountingEntryLine, "rodoo/models/accounting_entry_line"
   autoload :AnalyticAccount, "rodoo/models/analytic_account"
