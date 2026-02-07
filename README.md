@@ -279,6 +279,8 @@ Rodoo includes pre-built models for common Odoo objects:
 | `Rodoo::Project` | `project.project` |
 | `Rodoo::AnalyticAccount` | `account.analytic.account` |
 | `Rodoo::AnalyticPlan` | `account.analytic.plan` |
+| `Rodoo::Account` | `account.account` |
+| `Rodoo::Journal` | `account.journal` |
 | `Rodoo::Attachment` | `ir.attachment` |
 | `Rodoo::AccountingEntry` | `account.move` (all types) |
 | `Rodoo::CustomerInvoice` | `account.move` (move_type: out_invoice) |
