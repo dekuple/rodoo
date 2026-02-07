@@ -16,6 +16,7 @@ module Rodoo
   autoload :Attachment, "rodoo/models/attachment"
   autoload :CustomerCreditNote, "rodoo/models/customer_credit_note"
   autoload :CustomerInvoice, "rodoo/models/customer_invoice"
+  autoload :Journal, "rodoo/models/journal"
   autoload :JournalEntry, "rodoo/models/journal_entry"
   autoload :Contact, "rodoo/models/contact"
   autoload :Product, "rodoo/models/product"
