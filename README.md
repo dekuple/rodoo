@@ -1,6 +1,6 @@
 # Rodoo
 
-A Ruby gem wrapping Odoo's JSON-RPC 2.0 API (Odoo v19+) with an Active Record-style interface.
+A Ruby gem wrapping Odoo's external JSON-2 API (Odoo v19+) with an Active Record-style interface.
 
 ## Requirements
 
@@ -69,7 +69,7 @@ contact = Rodoo::Contact.find_by(name: "Acme Corp", is_company: true)
 # Find by string condition
 contact = Rodoo::Contact.find_by("credit_limit > 1000")
 
-# Find by raw domain
+# Find by raw Odoo domain
 contact = Rodoo::Contact.find_by([["name", "ilike", "%acme%"]])
 
 # Find by attributes (raises NotFoundError if not found)
