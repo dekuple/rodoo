@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+## [0.6.0] - 2026-02-22
+
+### Added
+
+- Add Account model for Odoo `account.account`
+- Add Journal model for Odoo `account.journal`
+
+### Fixed
+
+- Fix typos in README
+
 ## [0.5.0] - 2026-01-26
 
 ### Added
